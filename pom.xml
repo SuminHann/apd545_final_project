@@ -61,7 +61,7 @@
                         <id>default-cli</id>
                         <configuration>
                             <mainClass>
-                                com.example.apd545_final_project/com.example.apd545_final_project.HelloApplication
+                                com.example.apd545_final_project/com.example.apd545_final_project.MainApp
                             </mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
