@@ -35,7 +35,7 @@
             <PasswordField fx:id="password1" layoutX="60.0" layoutY="80.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" promptText="Password" />
             <PasswordField fx:id="password2" layoutX="60.0" layoutY="45.0" managed="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" promptText="Confirm Password" visible="false" />
             <Button fx:id="registerBtn" managed="false" mnemonicParsing="false" onAction="#registerUser" prefHeight="24.0" prefWidth="68.0" text="Register" textAlignment="CENTER" visible="false" />
-            <Button fx:id="loginBtn" mnemonicParsing="false" prefHeight="24.0" prefWidth="68.0" text="Login" textAlignment="CENTER" />
+            <Button fx:id="loginBtn" mnemonicParsing="false" onAction="#loginUser" prefHeight="24.0" prefWidth="68.0" text="Login" textAlignment="CENTER" />
             <Button fx:id="registerToggleBtn" focusTraversable="false" mnemonicParsing="false" onAction="#toggleRegister" prefHeight="24.0" prefWidth="68.0" text="Register" textAlignment="CENTER" />
          </children>
       </VBox>

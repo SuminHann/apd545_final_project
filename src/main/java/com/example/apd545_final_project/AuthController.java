@@ -41,7 +41,20 @@ public class AuthController {
     }
 
     @FXML
-    void loginBtnClick(ActionEvent event) {
+    void loginUser(ActionEvent event) {
+        String user = username.getText();
+        String pass = password1.getText();
+
+        List<User> users = mainApp.getUsers();
+        Optional<User> loginUser = users.stream().filter(u -> u.getUsername().equals(user) && u.getPassword().equals(pass)).findFirst();
+
+        if(loginUser.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING, "Username or password is incorrect.");
+            alert.showAndWait();
+            return;
+        }
+
+        mainApp.showMainView();
 
     }
 
@@ -84,6 +97,12 @@ public class AuthController {
         loginBtn.setManaged(!loginBtn.isManaged());
         registerBtn.setVisible(!registerBtn.isVisible());
         registerBtn.setManaged(!registerBtn.isManaged());
+
+        username.setText("");
+        name.setText("");
+        password1.setText("");
+        password2.setText("");
+
         registerToggleBtn.setText(registerToggleBtn.getText().equals("Register") ? "Login" : "Register");
     }
 

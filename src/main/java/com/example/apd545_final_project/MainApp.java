@@ -12,6 +12,7 @@ import java.util.List;
 public class MainApp extends Application {
     private Stage primaryStage;
     private List<User> users = new ArrayList<>();
+    private List<Journal> journals = new ArrayList<>();
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -36,7 +37,7 @@ public class MainApp extends Application {
         try {
             FXMLLoader mainView = new FXMLLoader(MainApp.class.getResource("main-view.fxml"));
             Scene mainScene = new Scene(mainView.load());
-            setPrimaryStage(mainScene, "APD545 Final Project");
+            setPrimaryStage(mainScene, "Travel Diary App");
         } catch (IOException err) {
             System.out.println(err.getMessage());
         }
