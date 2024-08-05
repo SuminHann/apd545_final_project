@@ -13,6 +13,7 @@ public class MainApp extends Application {
     private Stage primaryStage;
     private List<User> users = new ArrayList<>();
     private List<Journal> journals = new ArrayList<>();
+    private User user;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -45,6 +46,18 @@ public class MainApp extends Application {
 
     public List<User> getUsers() {
         return users;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public List<Journal> getJournals() {
+        return journals;
     }
 
     public void setPrimaryStage(Scene scene, String title) {

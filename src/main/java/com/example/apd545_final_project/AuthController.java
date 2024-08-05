@@ -8,10 +8,21 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class AuthController {
+
+    private Map<String, String> userCredentials = new HashMap<>();
+
+    private MainApp mainApp;
 
     @FXML
     private TextField name;
@@ -34,56 +45,84 @@ public class AuthController {
     @FXML
     private Button registerToggleBtn;
 
-    private MainApp mainApp;
 
-    public void setMainApp(MainApp mainApp) {
-        this.mainApp = mainApp;
+    public AuthController() {
+        File credentialsFile = new File("user_credentials.txt");
+        if (!credentialsFile.exists()) {
+            try {
+                credentialsFile.createNewFile();
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+
+        // Load existing user credentials from file
+        try {
+            Files.lines(Paths.get("user_credentials.txt")).forEach(line -> {
+                String[] parts = line.split(",");
+                userCredentials.put(parts[0], parts[1]);
+            });
+        } catch (IOException e) {
+            System.out.println(e.getMessage());;
+        }
+    }
+
+    public boolean register(String username, String password) {
+        if (userCredentials.containsKey(username)) {
+            return false; // Username already exists
+        }
+        userCredentials.put(username, password);
+        saveCredentials();
+        return true;
+    }
+
+    public boolean login(String username, String password) {
+        User loginUser = new User(username, password);
+        mainApp.setUser(loginUser);
+        return userCredentials.getOrDefault(username, "").equals(password);
+    }
+
+    private void saveCredentials() {
+        try (FileWriter writer = new FileWriter(new File("user_credentials.txt"))) {
+            for (Map.Entry<String, String> entry : userCredentials.entrySet()) {
+                writer.write(entry.getKey() + "," + entry.getValue() + name + "\n");
+            }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());;
+        }
     }
 
     @FXML
-    void loginUser(ActionEvent event) {
-        String user = username.getText();
-        String pass = password1.getText();
-
-        List<User> users = mainApp.getUsers();
-        Optional<User> loginUser = users.stream().filter(u -> u.getUsername().equals(user) && u.getPassword().equals(pass)).findFirst();
-
-        if(loginUser.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.WARNING, "Username or password is incorrect.");
-            alert.showAndWait();
-            return;
+    private void loginUser() {
+        String username = this.username.getText();
+        String password = this.password1.getText();
+        if (login(username, password)) {
+            showAlert(Alert.AlertType.INFORMATION, "Login Successful", "Welcome, " + username + "!");
+            mainApp.showMainView(); // Switch to main view
+        } else {
+            showAlert(Alert.AlertType.ERROR, "Login Failed", "Invalid username or password.");
         }
-
-        mainApp.showMainView();
-
     }
 
     @FXML
     void registerUser(ActionEvent event) {
-        String user = username.getText();
-        String nameText = name.getText();
-        String pass1 = password1.getText();
-        String pass2 = password2.getText();
-
+        String username = this.username.getText();
+        String name = this.name.getText();
+        String password = this.password1.getText();
+        String confirmPassword = this.password2.getText();
         List<User> users = mainApp.getUsers();
 
-        if (!pass1.equals(pass2)) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Passwords do not match.");
-            alert.showAndWait();
+        if (!password.equals(confirmPassword)) {
+            showAlert(Alert.AlertType.ERROR, "Registration Failed", "Passwords do not match.");
             return;
         }
-
-        Optional<User> existingUser = users.stream().filter(u -> u.getUsername().equals(user)).findFirst();
-
-        if(existingUser.isPresent()) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Username already exists.");
-            alert.showAndWait();
-        } else {
-            User newUser = new User(user, nameText, pass1);
-            mainApp.getUsers().add(newUser);
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Registration successful.");
-            alert.showAndWait();
+        if (register(username, password)) {
+            showAlert(Alert.AlertType.INFORMATION, "Registration Successful", "Account created for " + username + "!");
+            User newUser = new User(username, name);
+            users.add(newUser);
             toggleRegister();
+        } else {
+            showAlert(Alert.AlertType.ERROR, "Registration Failed", "Username already exists.");
         }
     }
 
@@ -104,6 +143,17 @@ public class AuthController {
         password2.setText("");
 
         registerToggleBtn.setText(registerToggleBtn.getText().equals("Register") ? "Login" : "Register");
+    }
+
+    private void showAlert(Alert.AlertType alertType, String title, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    public void setMainApp(MainApp mainApp) {
+        this.mainApp = mainApp;
     }
 
 }

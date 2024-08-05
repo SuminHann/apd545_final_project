@@ -5,22 +5,23 @@ import java.util.List;
 public class User {
     String username;
     String name;
-    String password;
     List<Journal> journals;
 
-    public User(String username, String name, String password) {
+    public User(String username, String name) {
         this.username = username;
         this.name = name;
-        this.password = password;
+    }
+
+    public User(String username, String name, List<Journal> journals) {
+        this.username = username;
+        this.name = name;
+        this.journals = journals;
     }
 
     public String getUsername() {
         return username;
     }
 
-    public String getPassword() {
-        return password;
-    }
 
     public String getName() {
         return name;
@@ -34,9 +35,6 @@ public class User {
         this.username = username;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
     public void setName(String name) {
         this.name = name;

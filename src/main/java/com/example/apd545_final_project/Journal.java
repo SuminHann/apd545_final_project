@@ -1,21 +1,16 @@
 package com.example.apd545_final_project;
 
-import javafx.scene.image.Image;
-
-import java.util.Date;
-import java.util.List;
-
 public class Journal {
     String title;
-    String body;
-    List<Image> images;
-    Date created;
-    Date updated;
+    String content;
+    String imagePath;
+    String created;
+    String updated;
 
-    public Journal(String title, String body, List<Image> images, Date created, Date updated) {
+    public Journal(String title, String content, String imagePath, String created, String updated) {
         this.title = title;
-        this.body = body;
-        this.images = images;
+        this.content = content;
+        this.imagePath = imagePath;
         this.created = created;
         this.updated = updated;
     }
@@ -24,19 +19,19 @@ public class Journal {
         return title;
     }
 
-    public String getBody() {
-        return body;
+    public String getContent() {
+        return content;
     }
 
-    public List<Image> getImages() {
-        return images;
+    public String getImages() {
+        return imagePath;
     }
 
-    public Date getCreated() {
+    public String getCreated() {
         return created;
     }
 
-    public Date getUpdated() {
+    public String getUpdated() {
         return updated;
     }
 
@@ -44,15 +39,15 @@ public class Journal {
         this.title = title;
     }
 
-    public void setBody(String body) {
-        this.body = body;
+    public void setBody(String content) {
+        this.content = content;
     }
 
-    public void setImages(List<Image> images) {
-        this.images = images;
+    public void setImages(String imagePath) {
+        this.imagePath = imagePath;
     }
 
-    public void setUpdated(Date updated) {
+    public void setUpdated(String updated) {
         this.updated = updated;
     }
 }
