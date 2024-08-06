@@ -2,10 +2,13 @@ package com.example.apd545_final_project;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -40,6 +43,9 @@ public class AuthController {
 
     @FXML
     private Button registerToggleBtn;
+
+    @FXML
+    private Button loginToggleBtn;
 
     public AuthController() {
         File credentialsFile = new File("user_credentials.txt");
@@ -119,29 +125,38 @@ public class AuthController {
             showAlert(Alert.AlertType.INFORMATION, "Registration Successful", "Account created for " + username + "!");
             User newUser = new User(username, name);
             mainApp.getUsers().add(newUser);
-            toggleRegister();
+            showLoginView();
         } else {
             showAlert(Alert.AlertType.ERROR, "Registration Failed", "Username already exists.");
         }
     }
 
     @FXML
-    void toggleRegister() {
-        name.setVisible(!name.isVisible());
-        name.setManaged(!name.isManaged());
-        password2.setVisible(!password2.isVisible());
-        password2.setManaged(!password2.isManaged());
-        loginBtn.setVisible(!loginBtn.isVisible());
-        loginBtn.setManaged(!loginBtn.isManaged());
-        registerBtn.setVisible(!registerBtn.isVisible());
-        registerBtn.setManaged(!registerBtn.isManaged());
+    void showLoginView() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("login-view.fxml"));
+            Scene scene = new Scene(loader.load());
+            AuthController controller = loader.getController();
+            controller.setMainApp(mainApp);
+            Stage stage = (Stage) loginToggleBtn.getScene().getWindow();
+            stage.setScene(scene);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 
-        username.setText("");
-        name.setText("");
-        password1.setText("");
-        password2.setText("");
-
-        registerToggleBtn.setText(registerToggleBtn.getText().equals("Register") ? "Login" : "Register");
+    @FXML
+    void showRegisterView() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("register-view.fxml"));
+            Scene scene = new Scene(loader.load());
+            AuthController controller = loader.getController();
+            controller.setMainApp(mainApp);
+            Stage stage = (Stage) registerToggleBtn.getScene().getWindow();
+            stage.setScene(scene);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private void showAlert(Alert.AlertType alertType, String title, String message) {

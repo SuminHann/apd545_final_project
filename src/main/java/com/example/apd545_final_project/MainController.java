@@ -4,10 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
@@ -15,6 +12,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.io.IOException;
+import java.util.Optional;
 
 // Other imports...
 
@@ -45,6 +43,15 @@ public class MainController {
         journalsList.setItems(observableJournals);
         loadJournals(); // Load journals when setting the main app
 
+    }
+
+    @FXML
+    private Button exitBtn;
+
+    @FXML
+    void exitApplication(ActionEvent event) {
+        Stage stage = (Stage) exitBtn.getScene().getWindow();
+        stage.close();
     }
 
     @FXML
@@ -107,6 +114,33 @@ public class MainController {
             }
         } else {
             showAlert(Alert.AlertType.WARNING, "No Selection", "Please select a journal entry to edit.");
+        }
+    }
+
+    @FXML
+    void deleteJournal(ActionEvent event) {
+        Journal selectedJournal = journalsList.getSelectionModel().getSelectedItem();
+        if (selectedJournal != null) {
+            // Confirm delete action
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Delete Journal");
+            alert.setHeaderText("Are you sure you want to delete this journal?");
+            alert.setContentText("This action cannot be undone.");
+
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                User currentUser = mainApp.getUser();
+                currentUser.getJournals().remove(selectedJournal);
+
+                UserController userController = new UserController();
+                userController.setMainApp(mainApp);
+                userController.deleteJournal(selectedJournal);
+
+                // Refresh the ListView
+                journalsList.getItems().remove(selectedJournal);
+            }
+        } else {
+            showAlert(Alert.AlertType.WARNING, "No Selection", "Please select a journal entry to delete.");
         }
     }
 

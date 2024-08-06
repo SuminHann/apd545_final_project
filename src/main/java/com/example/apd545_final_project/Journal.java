@@ -17,40 +17,41 @@ public class Journal {
         this.updated = updated;
     }
 
+    // Getters and Setters
     public String getTitle() {
         return title;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public String getImagePath() {
-        return imagePath;
-    }
-
-    public String getCreated() {
-        return created;
-    }
-
-    public String getUpdated() {
-        return updated;
     }
 
     public void setTitle(String title) {
         this.title = title;
     }
 
+    public String getContent() {
+        return content;
+    }
+
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+
+    public String getCreated() {
+        return created;
     }
 
     public void setCreated(String created) {
         this.created = created;
     }
 
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
+    public String getUpdated() {
+        return updated;
     }
 
     public void setUpdated(String updated) {
@@ -59,7 +60,7 @@ public class Journal {
 
     @Override
     public String toString() {
-        return title + " | Created: " + created; // Customize this format as needed
+        return title + " | Created: " + created;
     }
 
     @Override
@@ -67,16 +68,11 @@ public class Journal {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         Journal journal = (Journal) obj;
-        return title.equals(journal.title) &&
-                content.equals(journal.content) &&
-                imagePath.equals(journal.imagePath) &&
-                created.equals(journal.created) &&
-                updated.equals(journal.updated);
+        return title.equals(journal.title) && content.equals(journal.content) && imagePath.equals(journal.imagePath) && created.equals(journal.created) && updated.equals(journal.updated);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(title, content, imagePath, created, updated);
     }
-
 }

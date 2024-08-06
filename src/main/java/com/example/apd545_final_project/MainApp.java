@@ -19,20 +19,33 @@ public class MainApp extends Application {
     public void start(Stage stage) throws IOException {
         this.primaryStage = stage;
         primaryStage.setTitle("APD545 Final Project");
-        showAuthView();
+        showLoginView();
     }
 
-    public void showAuthView() {
+    public void showLoginView() {
         try {
-            FXMLLoader authView = new FXMLLoader(MainApp.class.getResource("authentication-view.fxml"));
-            Scene authScene = new Scene(authView.load());
-            AuthController authController = authView.getController();
+            FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("login-view.fxml"));
+            Scene scene = new Scene(loader.load());
+            AuthController authController = loader.getController();
             authController.setMainApp(this);
-            setPrimaryStage(authScene, "Register/Login");
+            setPrimaryStage(scene, "Login");
         } catch (IOException err) {
             System.out.println(err.getMessage());
         }
     }
+
+    public void showRegisterView() {
+        try {
+            FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("register-view.fxml"));
+            Scene scene = new Scene(loader.load());
+            AuthController authController = loader.getController();
+            authController.setMainApp(this);
+            setPrimaryStage(scene, "Register");
+        } catch (IOException err) {
+            System.out.println(err.getMessage());
+        }
+    }
+
 
     public void showMainView() {
         try {
