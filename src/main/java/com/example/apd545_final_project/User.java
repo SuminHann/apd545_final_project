@@ -1,18 +1,19 @@
 package com.example.apd545_final_project;
 
-import java.util.List;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 public class User {
     String username;
     String name;
-    List<Journal> journals;
+    private ObservableList<Journal> journals = FXCollections.observableArrayList();
 
     public User(String username, String name) {
         this.username = username;
         this.name = name;
     }
 
-    public User(String username, String name, List<Journal> journals) {
+    public User(String username, String name, ObservableList<Journal> journals) {
         this.username = username;
         this.name = name;
         this.journals = journals;
@@ -22,12 +23,11 @@ public class User {
         return username;
     }
 
-
     public String getName() {
         return name;
     }
 
-    public List<Journal> getJournals() {
+    public ObservableList<Journal> getJournals() {
         return journals;
     }
 
@@ -35,12 +35,11 @@ public class User {
         this.username = username;
     }
 
-
     public void setName(String name) {
         this.name = name;
     }
 
-    public void setJournals(List<Journal> journals) {
+    public void setJournals(ObservableList<Journal> journals) {
         this.journals = journals;
     }
 }

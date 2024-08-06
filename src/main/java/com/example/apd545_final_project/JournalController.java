@@ -20,7 +20,12 @@ public class JournalController {
     private void saveJournalEntries() {
         try (FileWriter writer = new FileWriter(new File("journal_entries.txt"))) {
             for (Journal journal : journals) {
-                writer.write(journal.getTitle() + journal.getContent() + journal.getImages() + journal.getCreated() + journal.getUpdated() + "\n");
+                writer.write(String.join("|",
+                        journal.getTitle(),
+                        journal.getContent(),
+                        journal.getImagePath(),
+                        journal.getCreated(),
+                        journal.getUpdated()) + "\n");
             }
         } catch (IOException e) {
             e.printStackTrace();

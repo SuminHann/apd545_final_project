@@ -1,6 +1,5 @@
 package com.example.apd545_final_project;
 
-import com.sun.tools.javac.Main;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -14,14 +13,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public class AuthController {
 
     private Map<String, String> userCredentials = new HashMap<>();
-
     private MainApp mainApp;
 
     @FXML
@@ -45,7 +41,6 @@ public class AuthController {
     @FXML
     private Button registerToggleBtn;
 
-
     public AuthController() {
         File credentialsFile = new File("user_credentials.txt");
         if (!credentialsFile.exists()) {
@@ -60,10 +55,12 @@ public class AuthController {
         try {
             Files.lines(Paths.get("user_credentials.txt")).forEach(line -> {
                 String[] parts = line.split(",");
-                userCredentials.put(parts[0], parts[1]);
+                if (parts.length == 2) { // Check to avoid ArrayIndexOutOfBoundsException
+                    userCredentials.put(parts[0], parts[1]);
+                }
             });
         } catch (IOException e) {
-            System.out.println(e.getMessage());;
+            System.out.println(e.getMessage());
         }
     }
 
@@ -77,18 +74,21 @@ public class AuthController {
     }
 
     public boolean login(String username, String password) {
-        User loginUser = new User(username, password);
-        mainApp.setUser(loginUser);
-        return userCredentials.getOrDefault(username, "").equals(password);
+        if (userCredentials.getOrDefault(username, "").equals(password)) {
+            User loginUser = new User(username, password);
+            mainApp.setUser(loginUser);
+            return true;
+        }
+        return false;
     }
 
     private void saveCredentials() {
         try (FileWriter writer = new FileWriter(new File("user_credentials.txt"))) {
             for (Map.Entry<String, String> entry : userCredentials.entrySet()) {
-                writer.write(entry.getKey() + "," + entry.getValue() + name + "\n");
+                writer.write(entry.getKey() + "," + entry.getValue() + "\n");
             }
         } catch (IOException e) {
-            System.out.println(e.getMessage());;
+            System.out.println(e.getMessage());
         }
     }
 
@@ -110,7 +110,6 @@ public class AuthController {
         String name = this.name.getText();
         String password = this.password1.getText();
         String confirmPassword = this.password2.getText();
-        List<User> users = mainApp.getUsers();
 
         if (!password.equals(confirmPassword)) {
             showAlert(Alert.AlertType.ERROR, "Registration Failed", "Passwords do not match.");
@@ -119,7 +118,7 @@ public class AuthController {
         if (register(username, password)) {
             showAlert(Alert.AlertType.INFORMATION, "Registration Successful", "Account created for " + username + "!");
             User newUser = new User(username, name);
-            users.add(newUser);
+            mainApp.getUsers().add(newUser);
             toggleRegister();
         } else {
             showAlert(Alert.AlertType.ERROR, "Registration Failed", "Username already exists.");
@@ -155,5 +154,4 @@ public class AuthController {
     public void setMainApp(MainApp mainApp) {
         this.mainApp = mainApp;
     }
-
 }

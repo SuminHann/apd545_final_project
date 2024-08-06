@@ -1,5 +1,7 @@
 package com.example.apd545_final_project;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -8,15 +10,17 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class JournalDialogController {
-
-    private MainController mainController;
-    private MainApp mainApp;
 
     @FXML
     private Button addBtn;
@@ -32,46 +36,68 @@ public class JournalDialogController {
 
     @FXML
     private Button uploadBtn;
-    private String oldEntry;
 
-    public TextField getTitle() {
-        return title;
-    }
+    @FXML
+    private ImageView imageView;
 
-    public TextArea getContent() {
-        return content;
-    }
-
-    public Button getAddBtn() {
-        return addBtn;
-    }
-
-    public Label getImagePath() {
-        return imagePath;
-    }
-
-    public void setImagePath(Label imagePath) {
-        this.imagePath = imagePath;
-    }
+    private MainApp mainApp;
 
     public void setMainApp(MainApp mainApp) {
         this.mainApp = mainApp;
     }
 
+    private Journal journalToEdit;
+
+    public void setJournal(Journal journal) {
+        this.journalToEdit = journal;
+        title.setText(journal.getTitle());
+        content.setText(journal.getContent());
+        imagePath.setText(journal.getImagePath());
+        Image image = new Image(new File(journal.getImagePath()).toURI().toString());
+        imageView.setImage(image);
+    }
+
     @FXML
     void handleAddJournal(ActionEvent event) {
-        String title = this.title.getText();
-        String content = this.content.getText();
-        String date = getCurrentDate();
-        String imagePath = this.imagePath.getText();
-        Journal newJournal = new Journal(title, content, imagePath, date, date);
-        List<Journal> userJournals = mainApp.getUser().getJournals();
-        userJournals.add(newJournal);
-        mainApp.getUser().setJournals(userJournals);
-        Stage stage = (Stage) addBtn.getScene().getWindow();
-        stage.close();
+        if (mainApp != null) {
+            User currentUser = mainApp.getUser();
+            if (currentUser != null) {
+                String title = this.title.getText();
+                String content = this.content.getText();
+                String date = getCurrentDate();
+                String imagePath = this.imagePath.getText();
+                Journal updatedJournal = new Journal(title, content, imagePath, date, date);
 
+                if (journalToEdit != null) {
+                    // Update the existing journal
+                    updatedJournal.setCreated(journalToEdit.getCreated());
+                    UserController userController = new UserController();
+                    userController.setMainApp(mainApp);
+                    userController.updateJournal(journalToEdit, updatedJournal);
+
+                    ObservableList<Journal> observableJournals = FXCollections.observableArrayList(currentUser.getJournals());
+                    observableJournals.remove(journalToEdit);
+                    observableJournals.add(updatedJournal);
+                    currentUser.setJournals(observableJournals);
+                } else {
+                    // Create a new journal entry
+                    UserController userController = new UserController();
+                    userController.setMainApp(mainApp);
+                    userController.saveJournal(updatedJournal);
+
+                    ObservableList<Journal> observableJournals = FXCollections.observableArrayList(currentUser.getJournals());
+                    observableJournals.add(updatedJournal);
+                    currentUser.setJournals(observableJournals);
+                }
+
+                Stage stage = (Stage) addBtn.getScene().getWindow();
+                stage.close();
+            } else {
+                System.out.println("MainApp is not set.");
+            }
+        }
     }
+
 
     @FXML
     void handleUploadImages(ActionEvent event) {
@@ -80,29 +106,14 @@ public class JournalDialogController {
         File selectedFile = fileChooser.showOpenDialog(uploadBtn.getScene().getWindow());
         if (selectedFile != null) {
             imagePath.setText(selectedFile.getAbsolutePath());
-        }
-    }
-
-    public void setJournalEntry(String entry, MainController mainController) {
-        this.mainController = mainController;
-        this.oldEntry = entry;
-        if (entry != null) {
-            String[] parts = entry.split(": ");
-            String[] titleDate = parts[0].split(" - ");
-            title.setText(titleDate[0]);;
-            content.setText(parts[1]);
-            // Assuming the image path is appended as [Image: <path>]
-            if (parts.length > 2) {
-                imagePath.setText(parts[2].replace("[Image: ", "").replace("]", ""));
-            }
+            Image image = new Image(selectedFile.toURI().toString());
+            imageView.setImage(image);
         }
     }
 
     private String getCurrentDate() {
         Date date = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
-        String strDate = formatter.format(date);
-        return strDate;
+        return formatter.format(date);
     }
-
 }

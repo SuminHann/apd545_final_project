@@ -1,18 +1,18 @@
 package com.example.apd545_final_project;
 
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainApp extends Application {
     private Stage primaryStage;
-    private List<User> users = new ArrayList<>();
-    private List<Journal> journals = new ArrayList<>();
+    private ObservableList<User> users = FXCollections.observableArrayList();
+    private ObservableList<Journal> journals = FXCollections.observableArrayList();
     private User user;
 
     @Override
@@ -38,13 +38,23 @@ public class MainApp extends Application {
         try {
             FXMLLoader mainView = new FXMLLoader(MainApp.class.getResource("main-view.fxml"));
             Scene mainScene = new Scene(mainView.load());
+            MainController mainController = mainView.getController();
+            mainController.setMainApp(this);
+
+            // Ensure journals are loaded before showing the main view
+            UserController userController = new UserController();
+            userController.setMainApp(this);
+            userController.loadUserJournals();
+
+            mainController.loadJournals(); // Load journals for the main view
             setPrimaryStage(mainScene, "Travel Diary App");
         } catch (IOException err) {
             System.out.println(err.getMessage());
         }
     }
 
-    public List<User> getUsers() {
+
+    public ObservableList<User> getUsers() {
         return users;
     }
 
@@ -56,7 +66,7 @@ public class MainApp extends Application {
         this.user = user;
     }
 
-    public List<Journal> getJournals() {
+    public ObservableList<Journal> getJournals() {
         return journals;
     }
 

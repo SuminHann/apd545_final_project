@@ -1,7 +1,8 @@
 package com.example.apd545_final_project;
 
-import java.io.File;
-import java.io.IOException;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -11,45 +12,96 @@ public class UserController {
 
     private MainApp mainApp;
 
-    private UserController() {
-        File userFile = new File("user_journal_entries.txt");
+    public void setMainApp(MainApp mainApp) {
+        this.mainApp = mainApp;
+        loadUserJournals();
+    }
+
+    public void loadUserJournals() {
+        User user = mainApp.getUser();
+        if (user == null) return;
+
+        String fileName = user.getUsername() + "_journals.txt";
+        File userFile = new File(fileName);
+
         if (!userFile.exists()) {
             try {
                 userFile.createNewFile();
-
             } catch (IOException e) {
                 System.out.println(e.getMessage());
             }
         }
-        loadUser();
+
+        List<Journal> journals = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(userFile))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",", 5);
+                if (parts.length >= 5) {
+                    Journal journal = new Journal(parts[0], parts[1], parts[2], parts[3], parts[4]);
+                    journals.add(journal);
+                }
+            }
+            ObservableList<Journal> observableJournals = FXCollections.observableArrayList(journals);
+            user.setJournals(observableJournals);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
-    public void loadUser() {
-        try {
-            Files.lines(Paths.get("user_journal_entries.txt")).forEach(line -> {
-                String[] parts = line.split(",");
-                if(parts[0].equals(mainApp.getUser().username)) {
-                    String[] journalLines = parts[2].split(";");
-                    List<Journal> journals = new ArrayList<>();
-                    for (String journal : journalLines) {
-                        String[] journalParts = journal.split(",");
-                        Journal j = new Journal(journalParts[0], journalParts[1], journalParts[2], journalParts[3], journalParts[4]);
-                        journals.add(j);
-                        User user = new User(parts[0], parts[1], journals);
-                        mainApp.setUser(user);
+    public void saveJournal(Journal journal) {
+        User user = mainApp.getUser();
+        if (user == null) return;
+
+        String fileName = user.getUsername() + "_journals.txt";
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true))) {
+            writer.write(journal.getTitle() + "," + journal.getContent() + "," + journal.getImagePath() + "," + journal.getCreated() + "," + journal.getUpdated() + "\n");
+        } catch (IOException e) {
+            System.out.println("An error occurred while saving the journal: " + e.getMessage());
+        }
+    }
+
+    public void updateJournal(Journal oldJournal, Journal newJournal) {
+        if (oldJournal != null) {
+            String fileName = mainApp.getUser().getUsername() + "_journals.txt";
+            List<Journal> journals = new ArrayList<>();
+
+            // Read all journals and update the old one
+            try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String[] parts = line.split(",", 5);
+                    if (parts.length >= 5) {
+                        Journal journal = new Journal(parts[0], parts[1], parts[2], parts[3], parts[4]);
+                        if (!journal.equals(oldJournal)) {
+                            journals.add(journal);
+                        }
                     }
                 }
-            });
-        } catch (IOException e) {
-            System.out.println(e.getMessage());;
+                // Add the updated journal entry
+                journals.add(newJournal);
+
+                // Save all journals back to the file
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+                    for (Journal journal : journals) {
+                        writer.write(String.join(",",
+                                journal.getTitle(),
+                                journal.getContent(),
+                                journal.getImagePath(),
+                                journal.getCreated(),
+                                journal.getUpdated()) + "\n");
+                    }
+                } catch (IOException e) {
+                    System.out.println("An error occurred while updating the journal: " + e.getMessage());
+                }
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
         }
     }
 
 
-
-    public void setMainApp(MainApp mainApp) {
-        this.mainApp = mainApp;
-    }
 
 
 }
